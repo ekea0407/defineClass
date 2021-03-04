@@ -3,12 +3,30 @@ var defineClass = (function(){
 
 	function extend(a , b){
 		for(var k in b){
-			a[k] = b[k];
+			if(getType(b[k]) == 'Array' || getType(b[k]) == 'Object'){
+				a[k] = deepCopy(b[k]);
+			}else{
+				a[k] = b[k];
+			}
 		}
 	}
 
 	function getType(arg){
 		return Object.prototype.toString.call(arg).replace('[object ','').replace(']' , '');
+	}
+
+	function deepCopy(obj) {
+	    var result = Array.isArray(obj) ? [] : {};
+	    for (var key in obj) {
+	        if (obj.hasOwnProperty(key)) {
+	            if (typeof obj[key] === 'object' && obj[key] !== null) {
+	                result[key] = deepCopy(obj[key]); //递归复制
+	            } else {
+	                result[key] = obj[key];
+	            }
+	        }
+	    }
+	    return result;
 	}
 
 	function mixinMembers(publicMembers , privateMembers , classDef){
@@ -77,7 +95,9 @@ var defineClass = (function(){
 		var privateMembers = {};
 		mixinMembers(publicMembers , privateMembers , classDef);
 
-		var classFunction = function(){
+		//var classFunction = 
+
+		return window[classDef.name] = function(){
 			var $this = {};
 
 			for(var k in publicMembers){
@@ -119,8 +139,6 @@ var defineClass = (function(){
 			
 			classDef.constructor.apply($this , arguments);
 		};
-
-		window[classDef.name] = classFunction;
-		return classFunction;
+		//return classFunction;
 	}
 })();
